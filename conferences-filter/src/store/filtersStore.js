@@ -17,7 +17,7 @@ export const useFiltersStore = create((set, get) => ({
   },
   filteredEvents: [],
 
-  // Устанавливаем фильтр
+  // Универсальный метод установки фильтра
   setFilter(key, value) {
     set((state) => ({
       selected: {
@@ -28,7 +28,30 @@ export const useFiltersStore = create((set, get) => ({
     get().applyFilters();
   },
 
-  // Сброс фильтров
+  // Удобные шорткаты
+  setTopics(topics) {
+    get().setFilter("topics", topics);
+  },
+
+  setCountry(countries) {
+    get().setFilter("countries", countries);
+  },
+
+  setCity(cities) {
+    get().setFilter("cities", cities);
+  },
+  setDateRange(dateStart, dateEnd) {
+    set((state) => ({
+      selected: {
+        ...state.selected,
+        dateStart,
+        dateEnd,
+      },
+    }));
+    get().applyFilters();
+  },
+
+  // Сброс всех фильтров
   resetFilters() {
     set({
       selected: {
@@ -63,6 +86,10 @@ export const useFiltersStore = create((set, get) => ({
         selected.countries.length > 0 &&
         !selected.countries.includes(event.country)
       )
+        return false;
+
+      // Фильтр по городам
+      if (selected.cities.length > 0 && !selected.cities.includes(event.city))
         return false;
 
       // Фильтр по тематикам

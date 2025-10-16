@@ -1,7 +1,7 @@
 import FilterPanel from "./FilterPanel";
 import CalendarFilter from "./CalendarFilter";
 
-export default function FilterContent({ id, active, conferenceList = [] }) {
+export default function FilterContent({ id, active }) {
   const isVisible = active === id;
 
   return (
@@ -15,7 +15,7 @@ export default function FilterContent({ id, active, conferenceList = [] }) {
         </div>
       ) : (
         <div className="filters_content_wrapper">
-          <FilterPanel id={id} conferenceList={conferenceList} />
+          <FilterPanel id={id} />
         </div>
       )}
     </div>

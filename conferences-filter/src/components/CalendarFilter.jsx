@@ -4,11 +4,10 @@ import "air-datepicker/air-datepicker.css";
 import PromoEvent from "./PromoEvent.jsx";
 import { useEventsStore } from "../store/eventsStore";
 import { useFiltersStore } from "../store/filtersStore";
-import CalendarInputs from "./CalendarInputs.jsx";
 
 export default function CalendarFilter() {
   const { loadEvents, getEventDates } = useEventsStore();
-  const { setFilter, selected } = useFiltersStore();
+  const { setFilter } = useFiltersStore();
 
   const calendarRef = useRef(null);
   const fromInputRef = useRef(null);

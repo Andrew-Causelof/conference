@@ -18,7 +18,6 @@ export const useEventsStore = create((set, get) => ({
     try {
       const data = await fetchEvents(type);
       const events = Array.isArray(data.events) ? data.events : [];
-      console.log(events);
       set({ events, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
