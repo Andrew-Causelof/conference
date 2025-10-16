@@ -5,3 +5,9 @@
 .filters_item.active.filters_item-calendar .filters_item-calendar_icon {
   color: #fe6e00;
 }
+
+.air-datepicker.-inline- {
+  border: none;
+  height: 100%;
+  width: 100%;
+}
