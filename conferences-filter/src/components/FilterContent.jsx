@@ -18,9 +18,6 @@ export default function FilterContent({ id, active }) {
           <FilterPanel title={id} />
         </div>
       )}
-      <div className="filters_content_wrapper">
-        {id === "calendar" ? <CalendarFilter /> : <FilterPanel title={id} />}
-      </div>
     </div>
   );
 }
