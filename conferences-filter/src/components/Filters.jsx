@@ -9,10 +9,22 @@ function Filters() {
       <FilterTabs active={activeFilter} onChange={setActiveFilter} />
       <div className="filters_body">
         <FilterContent id="calendar" active={activeFilter} />
-        <FilterContent id="topics" active={activeFilter} />
-        <FilterContent id="country" active={activeFilter} />
-        <FilterContent id="city" active={activeFilter} />
-        <FilterContent id="type" active={activeFilter} />
+        <FilterContent
+          id="topics"
+          active={activeFilter}
+          conferenceList={conferenceList}
+        />
+        <FilterContent
+          id="country"
+          active={activeFilter}
+          conferenceList={conferenceList}
+        />
+        <FilterContent
+          id="city"
+          active={activeFilter}
+          conferenceList={conferenceList}
+        />
+        {/* <FilterContent id="type" active={activeFilter} /> */}
       </div>
     </>
   );

@@ -1,15 +1,8 @@
+import { filterTabs } from "../constants/filterTabs";
 export default function FilterTabs({ active, onChange }) {
-  const tabs = [
-    { id: "calendar", label: "", className: "filters_item-calendar" },
-    { id: "topics", label: "Тематика" },
-    { id: "country", label: "Страна" },
-    { id: "city", label: "Город" },
-    { id: "type", label: "Тип" },
-  ];
-
   return (
     <div className="filters_items">
-      {tabs.map((t) => (
+      {filterTabs.map((t) => (
         <label
           key={t.id}
           className={`filters_item ${
