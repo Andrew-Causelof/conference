@@ -1,5 +1,18 @@
+import { useState } from "react";
 import { filterTabs } from "../constants/filterTabs";
+import { useEventsStore } from "../store/eventsStore";
+import { useFiltersStore } from "../store/filtersStore";
 export default function FilterTabs({ active, onChange }) {
+  const [activeType, setActiveType] = useState("upcoming");
+  const { loadEvents } = useEventsStore();
+  const { resetFilters } = useFiltersStore();
+
+  const handleClick = async (type) => {
+    setActiveType(type);
+    await loadEvents(type); // загружаем новые события
+    resetFilters(); // сбрасываем фильтры
+  };
+
   return (
     <div className="filters_items">
       {filterTabs.map((t) => (
@@ -24,9 +37,22 @@ export default function FilterTabs({ active, onChange }) {
           )}
         </label>
       ))}
-      <a className="filters_item filters_item-past" href="#">
-        Прошедшие
-      </a>
+
+      {activeType === "upcoming" ? (
+        <button
+          className="filters_item filters_item-past"
+          onClick={() => handleClick("past")}
+        >
+          Прошедшие
+        </button>
+      ) : (
+        <button
+          className="filters_item filters_item-past active"
+          onClick={() => handleClick("upcoming")}
+        >
+          Будущие
+        </button>
+      )}
     </div>
   );
 }

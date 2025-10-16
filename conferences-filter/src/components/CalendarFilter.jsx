@@ -6,7 +6,7 @@ import { useEventsStore } from "../store/eventsStore";
 import { useFiltersStore } from "../store/filtersStore";
 
 export default function CalendarFilter() {
-  const { loadEvents, getEventDates } = useEventsStore();
+  const { loadEvents, getEventDates, currentType } = useEventsStore();
   const { setFilter } = useFiltersStore();
 
   const calendarRef = useRef(null);
@@ -22,7 +22,6 @@ export default function CalendarFilter() {
     let destroyed = false;
 
     async function initCalendar() {
-      await loadEvents("upcoming");
       const eventDates = getEventDates();
 
       if (destroyed) return; // защита от race condition
@@ -31,11 +30,14 @@ export default function CalendarFilter() {
       if (dp) dp.destroy();
 
       dp = new AirDatepicker(calendarRef.current, {
-        minDate: new Date(),
+        // minDate: new Date(),
         range: true,
         fixedHeight: true,
         classes: "calendar",
         dateFormat: "dd.MM.yyyy",
+        ...(currentType === "upcoming"
+          ? { minDate: new Date() }
+          : { maxDate: new Date() }),
         onSelect: ({ formattedDate }) => {
           if (fromInputRef.current)
             fromInputRef.current.value = formattedDate[0] || "";
@@ -70,7 +72,7 @@ export default function CalendarFilter() {
       destroyed = true;
       if (dp) dp.destroy();
     };
-  }, []); // без зависимостей, чтобы не вызывался заново
+  }, [currentType]); // без зависимостей, чтобы не вызывался заново
 
   function parseDate(dateString) {
     if (!dateString) return null;
