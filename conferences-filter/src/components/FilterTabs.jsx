@@ -1,4 +1,3 @@
-// FilterTabs.jsx
 export default function FilterTabs({ active, onChange }) {
   const tabs = [
     { id: "calendar", label: "", className: "filters_item-calendar" },
@@ -20,7 +19,7 @@ export default function FilterTabs({ active, onChange }) {
         >
           {t.id === "calendar" ? (
             <svg
-              class="filters_item-calendar_icon"
+              className="filters_item-calendar_icon"
               viewBox="0 0 20 20"
               width="20"
               height="20"

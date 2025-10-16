@@ -2,8 +2,14 @@ import { useEffect, useRef } from "react";
 import AirDatepicker from "air-datepicker";
 import "air-datepicker/air-datepicker.css";
 import PromoEvent from "./PromoEvent.jsx";
+import { useEventsStore } from "../store/eventsStore";
+import { useFiltersStore } from "../store/filtersStore";
+import CalendarInputs from "./CalendarInputs.jsx";
 
 export default function CalendarFilter() {
+  const { loadEvents, getEventDates } = useEventsStore();
+  const { setFilter, selected } = useFiltersStore();
+
   const calendarRef = useRef(null);
   const fromInputRef = useRef(null);
   const toInputRef = useRef(null);
@@ -13,43 +19,58 @@ export default function CalendarFilter() {
   useEffect(() => {
     if (!calendarRef.current) return;
 
-    const dp = new AirDatepicker(calendarRef.current, {
-      minDate: new Date(),
-      range: true,
-      fixedHeight: true,
-      classes: "calendar",
-      onSelect: ({ formattedDate }) => {
-        if (fromInputRef.current)
-          fromInputRef.current.value = formattedDate[0] || "";
-        if (toInputRef.current)
-          toInputRef.current.value = formattedDate[1] || "";
-      },
-      onRenderCell: ({ date, cellType }) => {
-        if (cellType === "day") {
-          return {
-            html: `${date.getDate()}<span class='calendar_event_indicator'></span>`,
-            classes: "calendar_cell",
-            attrs: { title: "Has Event" },
-          };
-        }
-        if (cellType === "month" || cellType === "year") {
-          return {
-            classes: "calendar_cell",
-            attrs: { title: "Has Event" },
-          };
-        }
-      },
-    });
+    let dp;
+    let destroyed = false;
 
-    if (prevRef.current)
-      prevRef.current.addEventListener("click", () => dp.prev());
-    if (nextRef.current)
-      nextRef.current.addEventListener("click", () => dp.next());
+    async function initCalendar() {
+      await loadEvents("upcoming");
+      const eventDates = getEventDates();
+
+      if (destroyed) return; // защита от race condition
+
+      // Уничтожаем возможный предыдущий экземпляр (если вдруг остался)
+      if (dp) dp.destroy();
+
+      dp = new AirDatepicker(calendarRef.current, {
+        minDate: new Date(),
+        range: true,
+        fixedHeight: true,
+        classes: "calendar",
+        onSelect: ({ formattedDate }) => {
+          if (fromInputRef.current)
+            fromInputRef.current.value = formattedDate[0] || "";
+          if (toInputRef.current)
+            toInputRef.current.value = formattedDate[1] || "";
+
+          setFilter("dateStart", formattedDate[0] || null);
+          setFilter("dateEnd", formattedDate[1] || null);
+        },
+        onRenderCell: ({ date, cellType }) => {
+          if (cellType === "day") {
+            const isoDate = date.toISOString().split("T")[0];
+            const hasEvent = eventDates.includes(isoDate);
+
+            return {
+              html: `${date.getDate()}${
+                hasEvent ? "<span class='calendar_event_indicator'></span>" : ""
+              }`,
+              classes: hasEvent ? "calendar_cell has-event" : "calendar_cell",
+            };
+          }
+        },
+      });
+
+      if (prevRef.current) prevRef.current.onclick = () => dp.prev();
+      if (nextRef.current) nextRef.current.onclick = () => dp.next();
+    }
+
+    initCalendar();
 
     return () => {
-      dp.destroy();
+      destroyed = true;
+      if (dp) dp.destroy();
     };
-  }, []);
+  }, []); // без зависимостей, чтобы не вызывался заново
 
   return (
     <>
@@ -74,7 +95,7 @@ export default function CalendarFilter() {
           <input
             ref={fromInputRef}
             id="calendar-input-from"
-            type="text"
+            type="da"
             placeholder="01.01.2025"
           />
           <input
@@ -84,6 +105,8 @@ export default function CalendarFilter() {
             placeholder="01.01.2025"
           />
         </div>
+
+        {/* сам календарь */}
         <div ref={calendarRef} className="calendar"></div>
       </div>
 

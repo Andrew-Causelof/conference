@@ -1,4 +1,3 @@
-import React from "react";
 import { useState } from "react";
 import FilterTabs from "./FilterTabs";
 import FilterContent from "./FilterContent";

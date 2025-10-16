@@ -1,4 +1,3 @@
-// FilterContent.jsx
 import FilterPanel from "./FilterPanel";
 import CalendarFilter from "./CalendarFilter";
 
@@ -14,8 +13,8 @@ export default function FilterContent({ id, active }) {
           <CalendarFilter />
         </div>
       ) : (
-        <div className="filters_content">
-          <FilterPanel title={id} />
+        <div className="filters_content_wrapper">
+          <FilterPanel id={id} />
         </div>
       )}
     </div>
