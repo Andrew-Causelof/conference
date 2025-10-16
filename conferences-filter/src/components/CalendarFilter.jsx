@@ -35,6 +35,7 @@ export default function CalendarFilter() {
         range: true,
         fixedHeight: true,
         classes: "calendar",
+        dateFormat: "dd.MM.yyyy",
         onSelect: ({ formattedDate }) => {
           if (fromInputRef.current)
             fromInputRef.current.value = formattedDate[0] || "";
@@ -70,6 +71,23 @@ export default function CalendarFilter() {
       if (dp) dp.destroy();
     };
   }, []); // без зависимостей, чтобы не вызывался заново
+
+  function parseDate(dateString) {
+    if (!dateString) return null;
+
+    // поддерживаем оба формата: "20.10.2025" и "2025-10-20"
+    if (dateString.includes(".")) {
+      const [day, month, year] = dateString.split(".");
+      return new Date(`${year}-${month}-${day}`);
+    }
+
+    if (dateString.includes("-")) {
+      const [year, month, day] = dateString.split("-");
+      return new Date(`${year}-${month}-${day}`);
+    }
+
+    return null;
+  }
 
   return (
     <>
