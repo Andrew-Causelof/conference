@@ -1,0 +1,7 @@
+.filters-alt label.filters_item-arrow.active:after {
+  transform: rotate(-180deg);
+}
+
+.filters_item.active.filters_item-calendar .filters_item-calendar_icon {
+  color: #fe6e00;
+}
