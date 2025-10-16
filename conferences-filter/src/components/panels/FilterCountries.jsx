@@ -4,15 +4,17 @@ import { useEventsStore } from "../../store/eventsStore";
 
 export default function FilterCountries() {
   const { events } = useEventsStore();
-  const { selected, setCountry } = useFiltersStore();
-  const { countries: selectedCountries } = selected;
+  const { selected, filteredEvents, setCountry } = useFiltersStore();
+  const { countries: selectedCountries, dateStart, dateEnd } = selected;
+
+  const sourceEvents = dateStart && dateEnd ? filteredEvents : events;
 
   // Получаем уникальные страны
   const countries = useMemo(() => {
     const set = new Set();
-    events.forEach((e) => e.country && set.add(e.country));
+    sourceEvents.forEach((e) => e.country && set.add(e.country));
     return Array.from(set);
-  }, [events]);
+  }, [sourceEvents]);
 
   // Обработчик выбора/снятия галочки
   const toggleCountry = (country) => {
@@ -33,12 +35,12 @@ export default function FilterCountries() {
         onChange={() => setCountry([])}
       />
       <label className="filters_content_label" htmlFor="country-all">
-        Все <span>{events.length}</span>
+        Все <span>{sourceEvents.length}</span>
       </label>
 
       {countries.map((country) => {
         const checked = selectedCountries.includes(country);
-        const count = events.filter((e) => e.country === country).length;
+        const count = sourceEvents.filter((e) => e.country === country).length;
 
         return (
           <React.Fragment key={country}>

@@ -4,14 +4,17 @@ import { useEventsStore } from "../../store/eventsStore";
 
 export default function FilterTopics() {
   const { events } = useEventsStore();
-  const { selected, setTopics } = useFiltersStore();
-  const { topics: selectedTopics } = selected;
+  const { selected, filteredEvents, setTopics } = useFiltersStore();
+  const { topics: selectedTopics, dateStart, dateEnd } = selected;
+
+  // выбираем источник
+  const sourceEvents = dateStart && dateEnd ? filteredEvents : events;
 
   const topics = useMemo(() => {
     const map = new Map();
-    events.forEach((e) => e.topics?.forEach((t) => map.set(t.code, t)));
+    sourceEvents.forEach((e) => e.topics?.forEach((t) => map.set(t.code, t)));
     return Array.from(map.values());
-  }, [events]);
+  }, [sourceEvents]);
 
   const toggleTopic = (code) => {
     if (selectedTopics.includes(code))
@@ -29,12 +32,12 @@ export default function FilterTopics() {
         onChange={() => setTopics([])}
       />
       <label className="filters_content_label" htmlFor="topic-all">
-        Все <span>{events.length}</span>
+        Все <span>{sourceEvents.length}</span>
       </label>
 
       {topics.map((topic) => {
         const checked = selectedTopics.includes(topic.code);
-        const count = events.filter((c) =>
+        const count = sourceEvents.filter((c) =>
           c.topics?.some((t) => t.code === topic.code)
         ).length;
 

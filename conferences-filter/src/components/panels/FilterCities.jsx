@@ -4,15 +4,18 @@ import { useEventsStore } from "../../store/eventsStore";
 
 export default function FilterCities() {
   const { events } = useEventsStore();
-  const { selected, setCity } = useFiltersStore();
-  const { cities: selectedCities } = selected;
+  const { selected, filteredEvents, setCity } = useFiltersStore();
+  const { cities: selectedCities, dateStart, dateEnd } = selected;
+
+  // выбираем источник
+  const sourceEvents = dateStart && dateEnd ? filteredEvents : events;
 
   // Получаем уникальные города
   const cities = useMemo(() => {
     const set = new Set();
-    events.forEach((e) => e.city && set.add(e.city));
+    sourceEvents.forEach((e) => e.city && set.add(e.city));
     return Array.from(set);
-  }, [events]);
+  }, [sourceEvents]);
 
   const toggleCity = (city) => {
     if (selectedCities.includes(city)) {
@@ -32,12 +35,12 @@ export default function FilterCities() {
         onChange={() => setCity([])}
       />
       <label className="filters_content_label" htmlFor="city-all">
-        Все <span>{events.length}</span>
+        Все <span>{sourceEvents.length}</span>
       </label>
 
       {cities.map((city) => {
         const checked = selectedCities.includes(city);
-        const count = events.filter((e) => e.city === city).length;
+        const count = sourceEvents.filter((e) => e.city === city).length;
 
         return (
           <React.Fragment key={city}>
