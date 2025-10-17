@@ -61,7 +61,9 @@ export default function FilterTabs({ active, onChange }) {
       ))}
 
       <button
-        class={`filters_item filters_item-past ${hasFilters ? "active" : ""}`}
+        className={`filters_item filters_item-past ${
+          hasFilters ? "active" : ""
+        }`}
         type="button"
         onClick={() => handleReset()}
       >

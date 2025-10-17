@@ -13,13 +13,15 @@ export const useEventsStore = create((set, get) => ({
   loading: false,
   error: null,
   currentType: "upcoming",
+  mainEvent: null,
 
   async loadEvents(type = "upcoming") {
     set({ loading: true, error: null });
     try {
       const data = await fetchEvents(type);
       const events = Array.isArray(data.events) ? data.events : [];
-      set({ events, loading: false, currentType: type });
+      const mainEvent = data.mainEvent || null;
+      set({ events, mainEvent, loading: false, currentType: type });
     } catch (err) {
       set({ error: err.message, loading: false });
     }

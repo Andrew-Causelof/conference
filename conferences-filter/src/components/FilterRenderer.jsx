@@ -4,7 +4,7 @@ import { useFiltersStore } from "../store/filtersStore";
 export default function FilterRenderer() {
   const { selected, filteredEvents } = useFiltersStore();
 
-  async function loadFiltered(page = 1) {
+  async function loadFiltered(page = 1, append = false) {
     if (!filteredEvents || filteredEvents.length === 0) return;
 
     const response = await fetch("/api/events/filter", {
@@ -20,14 +20,47 @@ export default function FilterRenderer() {
     const container = document.querySelector(".filter-conference-list");
     if (!container) return;
 
-    if (page === 1) {
+    if (!append) {
+      // перезаписываем весь контент при первой загрузке
       container.innerHTML = html;
     } else {
+      // создаём временный контейнер для вставки новых карточек
       const temp = document.createElement("div");
       temp.innerHTML = html;
-      const newItems = temp.querySelectorAll(".conference-item");
+
+      // вставляем новые элементы
+      const newItems = temp.querySelectorAll(".box.box-default");
       newItems.forEach((el) => container.appendChild(el));
+
+      // удаляем старую кнопку
+      const oldBtn = container.querySelector(".js-more-items");
+      if (oldBtn) oldBtn.parentElement.remove();
+
+      // добавляем новую кнопку, если есть
+      const newBtn = temp.querySelector(".js-more-items");
+      if (newBtn) container.appendChild(newBtn);
     }
+
+    // навешиваем обработчик на кнопку "Загрузить ещё"
+    attachLoadMoreHandler();
+  }
+
+  function attachLoadMoreHandler() {
+    const btn = document.querySelector(
+      ".filter-conference-list .js-more-items"
+    );
+    if (!btn) return;
+
+    // удаляем возможные старые слушатели (через замену узла)
+    const newBtn = btn.cloneNode(true);
+    btn.replaceWith(newBtn);
+
+    newBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const url = newBtn.dataset.url;
+      const page = parseInt(url.match(/PAGEN_1=(\d+)/)?.[1] || "2", 10);
+      loadFiltered(page, true);
+    });
   }
 
   useEffect(() => {
@@ -35,7 +68,7 @@ export default function FilterRenderer() {
     const container = document.querySelector(".filter-conference-list");
     if (!listEl || !container) return;
 
-    // Проверяем, есть ли активные фильтры
+    // Проверяем активные фильтры
     const hasFilters =
       selected.dateStart ||
       selected.dateEnd ||
@@ -43,18 +76,25 @@ export default function FilterRenderer() {
       (selected.cities && selected.cities.length > 0) ||
       (selected.topics && selected.topics.length > 0);
 
-    // Если фильтры активны — скрываем оригинальный блок и загружаем результат
     if (hasFilters) {
       listEl.style.display = "none";
       container.style.display = "flex";
       loadFiltered(1);
     } else {
-      // Если фильтры сброшены — показываем оригинальный серверный список
+      // Возврат к серверному списку
       container.innerHTML = "";
       container.style.display = "none";
-      document.querySelector(".conferences-list").style.display = "flex";
+      listEl.style.display = "flex";
     }
-  }, [selected]); // следим за изменением фильтров
+
+    return () => {
+      // Чистим обработчики при размонтировании
+      const btn = document.querySelector(
+        ".filter-conference-list .js-more-items"
+      );
+      if (btn) btn.replaceWith(btn.cloneNode(true));
+    };
+  }, [selected]);
 
   return null;
 }
