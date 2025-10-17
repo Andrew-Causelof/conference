@@ -1,16 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { filterTabs } from "../constants/filterTabs";
 import { useEventsStore } from "../store/eventsStore";
 import { useFiltersStore } from "../store/filtersStore";
 export default function FilterTabs({ active, onChange }) {
   const [activeType, setActiveType] = useState("upcoming");
   const { loadEvents } = useEventsStore();
-  const { resetFilters } = useFiltersStore();
+  const { resetFilters, selected } = useFiltersStore();
+  const [hasFilters, setHasEvents] = useState(false);
 
   const handleClick = async (type) => {
     setActiveType(type);
     await loadEvents(type); // загружаем новые события
     resetFilters(); // сбрасываем фильтры
+  };
+
+  useEffect(() => {
+    const hasItems =
+      selected.dateStart ||
+      selected.dateEnd ||
+      (selected.countries && selected.countries.length > 0) ||
+      (selected.cities && selected.cities.length > 0) ||
+      (selected.topics && selected.topics.length > 0);
+
+    if (hasItems) {
+      setHasEvents(true);
+    } else {
+      setHasEvents(false);
+    }
+  }, [selected]);
+
+  const handleReset = () => {
+    if (hasFilters) {
+      resetFilters();
+    }
   };
 
   return (
@@ -37,6 +59,14 @@ export default function FilterTabs({ active, onChange }) {
           )}
         </label>
       ))}
+
+      <button
+        class={`filters_item filters_item-past ${hasFilters ? "active" : ""}`}
+        type="button"
+        onClick={() => handleReset()}
+      >
+        <span>Сбросить</span>
+      </button>
 
       {activeType === "upcoming" ? (
         <button

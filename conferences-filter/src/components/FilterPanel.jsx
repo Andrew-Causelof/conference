@@ -1,7 +1,6 @@
 import FilterTopics from "./panels/FilterTopics";
 import FilterCountries from "./panels/FilterCountries";
 import FilterCities from "./panels/FilterCities";
-import { useFiltersStore } from "../store/filtersStore";
 
 const panelsMap = {
   topics: { title: "Тематика", component: FilterTopics },
@@ -10,14 +9,9 @@ const panelsMap = {
   // type: { title: "Тип", component: FilterType },
 };
 
-export default function FilterPanel({ id }) {
+export default function FilterPanel({ id, setActiveFilter }) {
   const panel = panelsMap[id];
   if (!panel) return null;
-
-  const { selected, filteredEvents } = useFiltersStore();
-
-  console.log("selected", selected);
-  console.log("filteredEvents", filteredEvents);
 
   const PanelComponent = panel.component;
 
@@ -30,7 +24,11 @@ export default function FilterPanel({ id }) {
       <PanelComponent />
 
       <div className="filters_content_actions">
-        <button className="btn btn--primary btn--md btn--f16" type="button">
+        <button
+          className="btn btn--primary btn--md btn--f16"
+          type="button"
+          onClick={() => setActiveFilter(null)}
+        >
           <span>Применить</span>
         </button>
       </div>

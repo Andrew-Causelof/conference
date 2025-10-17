@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import AirDatepicker from "air-datepicker";
-import "air-datepicker/air-datepicker.css";
+// import "air-datepicker/air-datepicker.css";
 import PromoEvent from "./PromoEvent.jsx";
-// если у тебя свой компонент инпутов – оставь, я опускаю его здесь ради краткости
 import { useEventsStore } from "../store/eventsStore";
 import { useFiltersStore } from "../store/filtersStore";
 import DateInput from "./DateInput";
@@ -76,9 +75,7 @@ export default function CalendarFilter() {
     }
 
     return () => dpRef.current?.destroy();
-    // важное: зависим и от типа, и от данных
   }, [currentType, events]); // ← ключ: обновляемся, когда приехали события
-  // Обновление календаря при ручном вводе
   const handleDateChange = (key, value) => {
     const updated = { ...range, [key]: value };
     setRange(updated);
